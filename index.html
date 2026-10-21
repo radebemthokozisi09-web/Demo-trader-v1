@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<title>DEMO TRADER</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:18px;background:#07111f;color:#f4f7fb;font-family:Arial,sans-serif}
+main{max-width:650px;margin:auto}
+header{text-align:center;padding:20px 0}
+h1{color:#35e0b0;letter-spacing:3px}
+.card{background:#101d30;border:1px solid #23354d;border-radius:15px;padding:18px;margin:15px 0}
+h2{font-size:17px}
+label{display:block;margin:15px 0 7px;color:#b8c7db}
+select,input,button{width:100%;padding:13px;border-radius:9px;font-size:15px}
+select,input{background:#07111f;color:white;border:1px solid #354964}
+button{border:0;margin-top:15px;background:#35e0b0;color:#07111f;font-weight:bold}
+.muted{color:#9aabc2;font-size:13px;line-height:1.6}
+.status{display:inline-block;padding:8px;border-radius:20px;background:#302716;color:#ffd27a;font-size:12px}
+.metric{background:#07111f;border-radius:10px;padding:13px;margin:10px 0}
+.warning{background:#302716;border-radius:9px;padding:12px;color:#ffd27a;font-size:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>DEMO TRADER</h1>
+<p class="muted">SMART MARKET ANALYSIS</p>
+<span class="status">LIVE TRADING DISABLED</span>
+<p class="muted">Version 1.0</p>
+</header>
+
+<section class="card">
+<h2>Market Scanner</h2>
+<label for="broker">Broker</label>
+<select id="broker">
+<option>XM</option><option>RCG Markets</option>
+</select>
+
+<label for="platform">Platform</label>
+<select id="platform">
+<option>MT5</option><option>MT4</option>
+</select>
+
+<label for="market">Market</label>
+<select id="market">
+<option>XAUUSD — Gold</option>
+<option>XAGUSD — Silver</option>
+<option>EURUSD</option>
+<option>GBPUSD</option>
+<option>USDJPY</option>
+<option>AUDUSD</option>
+<option>NZDUSD</option>
+<option>USDCAD</option>
+<option>USDCHF</option>
+<option>NAS100 — Nasdaq</option>
+<option>US30 — Dow Jones</option>
+<option>US500 — S&P 500</option>
+<option>GER40</option>
+</select>
+
+<label for="tf">Entry timeframe</label>
+<select id="tf">
+<option>M1 — 1 minute</option>
+<option>M5 — 5 minutes</option>
+<option>M15 — 15 minutes</option>
+<option>M30 — 30 minutes</option>
+<option>H1 — 1 hour</option>
+<option>D1 — Daily</option>
+</select>
+
+<label for="strategy">Strategy</label>
+<select id="strategy">
+<option>ICT + CRT + SMC + Indicators</option>
+<option>ICT + CRT</option>
+<option>SMC</option>
+<option>Technical Indicators</option>
+</select>
+
+<button id="scan">CHECK CONFIGURATION</button>
+<div class="metric">
+<strong id="signal">WAITING FOR REAL DATA</strong>
+<p id="details" class="muted">No market analysis performed.</p>
+</div>
+</section>
+
+<section class="card">
+<h2>Position Settings</h2>
+<label for="lots">Manual lot size</label>
+<input id="lots" type="number" min="0.01" step="0.01" value="0.01">
+
+<label for="risk">Maximum planned risk (%)</label>
+<input id="risk" type="number" min="0.1" max="1" step="0.1" value="0.5">
+
+<label for="rr">Risk-to-reward target</label>
+<select id="rr">
+<option>1:2</option><option selected>1:3</option><option>1:4</option>
+</select>
+
+<button id="save">SAVE SETTINGS</button>
+<p id="saved" class="muted">Settings not saved.</p>
+</section>
+
+<section class="card">
+<h2>System Status</h2>
+<p>Market data: <strong>Not connected</strong></p>
+<p>Broker: <strong>Not connected</strong></p>
+<p>Strategy engine: <strong>Not implemented</strong></p>
+<p>Order execution: <strong>Disabled</strong></p>
+<div class="warning">
+This version is a dashboard only. It does not receive live prices,
+calculate real trading signals, connect to MT4/MT5, or place orders.
+</div>
+</section>
+</main>
+
+<script>
+document.getElementById("scan").onclick=function(){
+document.getElementById("signal").textContent="NO SIGNAL — NO LIVE DATA";
+document.getElementById("details").textContent=
+document.getElementById("broker").value+" | "+
+document.getElementById("platform").value+" | "+
+document.getElementById("market").value+" | "+
+document.getElementById("tf").value+" | "+
+document.getElementById("strategy").value+
+". Configuration only; no live analysis is performed.";
+};
+
+document.getElementById("save").onclick=function(){
+const lots=Number(document.getElementById("lots").value);
+const risk=Number(document.getElementById("risk").value);
+if(!Number.isFinite(lots)||lots<0.01||lots>100||
+!Number.isFinite(risk)||risk<0.1||risk>1){
+document.getElementById("saved").textContent=
+"Invalid values. Lot size: 0.01–100; risk: 0.1%–1%.";
+return;
+}
+const settings={lots,risk,rr:document.getElementById("rr").value};
+try{
+localStorage.setItem("demoTraderSettings",JSON.stringify(settings));
+document.getElementById("saved").textContent=
+"Settings saved on this device. No orders placed.";
+}catch(e){
+document.getElementById("saved").textContent=
+"Browser storage unavailable.";
+}
+};
+
+try{
+const s=JSON.parse(localStorage.getItem("demoTraderSettings"));
+if(s){
+document.getElementById("lots").value=s.lots;
+document.getElementById("risk").value=s.risk;
+document.getElementById("rr").value=s.rr;
+document.getElementById("saved").textContent="Saved settings loaded.";
+}
+}catch(e){}
+</script>
+</body>
+</html>
